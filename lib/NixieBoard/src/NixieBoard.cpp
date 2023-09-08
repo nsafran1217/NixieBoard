@@ -18,7 +18,6 @@ NixieBoard::NixieBoard(uint8_t dataPin, uint8_t clockPin, uint8_t latchPin)
 
 void NixieBoard::writeToNixie(int hours, int minutes, int seconds, int divider) // write data to nixie tubes
 {
-    // printNixieToSerial(hours, minutes, seconds, divider); //degug
     digitalWrite(_latchPin, LOW);
     shiftOut(_dataPin, _clockPin, MSBFIRST, divider);
     shiftOut(_dataPin, _clockPin, MSBFIRST, convertToNixe(seconds));
@@ -29,7 +28,6 @@ void NixieBoard::writeToNixie(int hours, int minutes, int seconds, int divider) 
 
 void NixieBoard::writeToNixieRAW(int hours, int minutes, int seconds, int divider) // write data to nixie tubes RAW
 {
-    // printNixieToSerial(hours, minutes, seconds, divider);
     digitalWrite(_latchPin, LOW);
     shiftOut(_dataPin, _clockPin, MSBFIRST, divider);
     shiftOut(_dataPin, _clockPin, MSBFIRST, seconds);
@@ -62,8 +60,9 @@ void NixieBoard::writeToNixieScroll(int hours, int minutes, int seconds, int div
         hasDigitChanged[i] = digitsToDisplay[i] != lastDigitsDisplayed[i];
     }
 
-    // Attempt to do it digit by digit
+    // Attempt to do it digit by digit. only counts up one tube at a time. If all 6 change, it will take longer
     // Want to start at seconds
+    //I think this meathod just counts until it hits 10. Need to experiment with it.
     for (int i = 5; i > -1; i--)
     {
         if (digitsToDisplay[i] != lastDigitsDisplayed[i])
@@ -71,18 +70,18 @@ void NixieBoard::writeToNixieScroll(int hours, int minutes, int seconds, int div
             do
             {
                 lastDigitsDisplayed[i]++;
-                writeToNixieRAW((lastDigitsDisplayed[0] % 10) | ((lastDigitsDisplayed[1] % 10) << 4),
+                writeToNixieRAW((lastDigitsDisplayed[0] % 10) | ((lastDigitsDisplayed[1] % 10) << 4), //TODO: Is the mod 10 needed here? I think its already modded at this point
                                 (lastDigitsDisplayed[2] % 10) | ((lastDigitsDisplayed[3] % 10) << 4),
                                 (lastDigitsDisplayed[4] % 10) | ((lastDigitsDisplayed[5] % 10) << 4),
                                 divider);
-                delay(15);
+                delay(15);  //hardcoded scroll time
             } while (lastDigitsDisplayed[i] % 10 != digitsToDisplay[i] || lastDigitsDisplayed[i] < 10); //have to see what this looks like.
             //if its changed to 11, it will count way more
         }
     }
 
     // int workingScrollBuffer[6] = {(_currentHours / 10) % 10, _currentHours % 10, (_currentMinutes / 10) % 10, _currentMinutes % 10, (_currentSeconds / 10) % 10, _currentSeconds % 10};
-    //This is a diffent way of doing the old meathod.should count up to the incorrect number then immeditaly clean up with the final write to nixe call
+    //This is a diffent way of doing the old meathod.should count up to the incorrect number then immeditaly clean up with the final writetonixie call
     /*
     for (int j = 0; j < 11; j++)
     {

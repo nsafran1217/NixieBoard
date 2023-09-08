@@ -6,6 +6,11 @@ Nathan Safran - 6/30/2023
 #ifndef NixieBoard_h
 #define NixieBoard_h
 #include "Arduino.h"
+
+#define ALLON 15
+#define BOTON 6
+#define ALLOFF 0
+
 class NixieBoard
 {
   public:
