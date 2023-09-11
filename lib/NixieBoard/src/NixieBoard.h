@@ -15,19 +15,19 @@ class NixieBoard
 {
   public:
     NixieBoard(uint8_t dataPin, uint8_t clockPin, uint8_t latchPin);
-    void writeToNixieScroll(int hours, int minutes, int seconds, int divider);
-    void writeToNixie(int hours, int minutes, int seconds, int divider);  //write numbers to the nixie tubes
-    void writeToNixieRAW(int hours, int minutes, int seconds, int divider); //write arbitary data to the nixie tubes
+    void writeToNixieScroll(uint8_t hours, uint8_t minutes, uint8_t seconds, uint8_t divider);
+    void writeToNixie(uint8_t hours, uint8_t minutes, uint8_t seconds, uint8_t divider);  //write numbers to the nixie tubes
+    void writeToNixieRAW(uint8_t hours, uint8_t minutes, uint8_t seconds, uint8_t divider); //write arbitary data to the nixie tubes
     void antiPoison();
 
   private:
-    int _dataPin;
-    int _clockPin;
-    int _latchPin;
-    int _currentHours;
-    int _currentMinutes;
-    int _currentSeconds;
-    int convertToNixe(int num); //convert 2 digit number to display on nixie tubes
+    uint8_t _dataPin;
+    uint8_t _clockPin;
+    uint8_t _latchPin;
+    uint8_t _currentHours;
+    uint8_t _currentMinutes;
+    uint8_t _currentSeconds;
+    int convertToNixe(uint8_t num); //convert 2 digit number to display on nixie tubes
   
     unsigned long _timeSinceLastScroll;
 

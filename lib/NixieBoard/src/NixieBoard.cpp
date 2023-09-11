@@ -16,7 +16,7 @@ NixieBoard::NixieBoard(uint8_t dataPin, uint8_t clockPin, uint8_t latchPin)
     _latchPin = latchPin;
 }
 
-void NixieBoard::writeToNixie(int hours, int minutes, int seconds, int divider) // write data to nixie tubes
+void NixieBoard::writeToNixie(uint8_t hours, uint8_t minutes, uint8_t seconds, uint8_t divider) // write data to nixie tubes
 {
     digitalWrite(_latchPin, LOW);
     shiftOut(_dataPin, _clockPin, MSBFIRST, divider);
@@ -26,7 +26,7 @@ void NixieBoard::writeToNixie(int hours, int minutes, int seconds, int divider) 
     digitalWrite(_latchPin, HIGH);
 }
 
-void NixieBoard::writeToNixieRAW(int hours, int minutes, int seconds, int divider) // write data to nixie tubes RAW
+void NixieBoard::writeToNixieRAW(uint8_t hours, uint8_t minutes, uint8_t seconds, uint8_t divider) // write data to nixie tubes RAW
 {
     digitalWrite(_latchPin, LOW);
     shiftOut(_dataPin, _clockPin, MSBFIRST, divider);
@@ -43,16 +43,16 @@ void NixieBoard::writeToNixieRAW(int hours, int minutes, int seconds, int divide
 // since each digit will take a different amount of time
 // current from 5 to 0 it goes -> 6,7,8,9,0,1,2,3,4,5,0
 // If this was a real machine, it wouldnt do that
-void NixieBoard::writeToNixieScroll(int hours, int minutes, int seconds, int divider) // this will be annoying i need an efficiant way to do this. or brute force it
+void NixieBoard::writeToNixieScroll(uint8_t hours, uint8_t minutes, uint8_t seconds, uint8_t divider) // this will be annoying i need an efficiant way to do this. or brute force it
 {                                                                                     // this is so messy I hate it
                                                                                       // fix and generalize this.
                                                                                       // we still need to store the current state of the tubes so we can determine who needs to scroll
                                                                                       // we'll make private variables called current__
 
-    int digitsToDisplay[6] = {
+    uint8_t digitsToDisplay[6] = {
         (hours / 10) % 10, hours % 10, (minutes / 10) % 10, minutes % 10, (seconds / 10) % 10, seconds % 10};
 
-    int lastDigitsDisplayed[6] = {
+    uint8_t lastDigitsDisplayed[6] = {
         (_currentHours / 10) % 10, _currentHours % 10, (_currentMinutes / 10) % 10, _currentMinutes % 10, (_currentSeconds / 10) % 10, _currentSeconds % 10};
     boolean hasDigitChanged[6] = {};
     for (int i = 0; i < 6; i++)
@@ -80,7 +80,7 @@ void NixieBoard::writeToNixieScroll(int hours, int minutes, int seconds, int div
         }
     }
 
-    // int workingScrollBuffer[6] = {(_currentHours / 10) % 10, _currentHours % 10, (_currentMinutes / 10) % 10, _currentMinutes % 10, (_currentSeconds / 10) % 10, _currentSeconds % 10};
+    // uint8_t workingScrollBuffer[6] = {(_currentHours / 10) % 10, _currentHours % 10, (_currentMinutes / 10) % 10, _currentMinutes % 10, (_currentSeconds / 10) % 10, _currentSeconds % 10};
     //This is a diffent way of doing the old meathod.should count up to the incorrect number then immeditaly clean up with the final writetonixie call
     /*
     for (int j = 0; j < 11; j++)
@@ -120,16 +120,7 @@ void NixieBoard::antiPoison() // Rotate all digits. Will block the execution of 
     }
 }
 
-int NixieBoard::convertToNixe(int num) // convert 2 digit number to display on nixie tubes
+int NixieBoard::convertToNixe(uint8_t num) // convert 2 digit number to display on nixie tubes
 {
-    int nixienum;
-    if (num == 255) // blank the display
-    {
-        nixienum = num;
-    }
-    else
-    {
-        nixienum = ((num / 10) % 10) | ((num % 10) << 4); // hours (tens digit) or-ed with (ones place shifted 4 left)
-    }
-    return nixienum;
+    return num == 255 ? num : ((num / 10) % 10) | ((num % 10) << 4);
 }
